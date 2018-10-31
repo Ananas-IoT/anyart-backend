@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'oauth2_provider',
+    'rest_framework.authtoken',
+    'rest_auth',
 ]
 
 MIDDLEWARE = [
@@ -127,6 +128,5 @@ REST_FRAMEWORK = {
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
-        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
     ]
 }
