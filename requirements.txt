@@ -11,6 +11,7 @@ protobuf==3.6.1
 pyasn1==0.4.4
 pyasn1-modules==0.2.2
 pycryptodome==3.4.3
+pygments
 Pyrebase==3.0.27
 python-jwt==2.0.1
 pytz==2018.5
