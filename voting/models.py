@@ -5,7 +5,7 @@ from authorization.models import User
 
 
 class Vote(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = User()
     vote = models.IntegerField(blank=False)
     timestamp = models.DateTimeField()
 
