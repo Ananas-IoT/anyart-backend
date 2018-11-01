@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from approval.models import Veto
-from registration.models import *
+from authorization.models import *
 
 
 class UserGroupSerializer(serializers.Serializer):

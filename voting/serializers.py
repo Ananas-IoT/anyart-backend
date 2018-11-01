@@ -12,5 +12,5 @@ class VoteSerializer(serializers.ModelSerializer):
 class GovernmentVoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = GovernmentVote
-        fields = ( 'vote', 'timestamp')
+        fields = ('vote', 'timestamp')
 

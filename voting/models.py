@@ -1,7 +1,7 @@
 from django.db import models
 
 # Create your models here.
-from registration.models import User
+from authorization.models import User
 
 
 class Vote(models.Model):

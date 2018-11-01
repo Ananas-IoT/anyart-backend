@@ -1,7 +1,7 @@
 from django.db import models
 
 # Create your models here.
-from registration.models import Hierarchy
+from authorization.models import Hierarchy
 
 
 class CustomLimitation(models.Model):

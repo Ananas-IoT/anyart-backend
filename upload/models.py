@@ -3,7 +3,7 @@ from django.db import models
 # Create your models here.
 from approval.models import CustomLimitation
 from map.models import Location
-from registration.models import User, Hierarchy
+from authorization.models import User, Hierarchy
 
 
 class PhotoUpload(models.Model):
