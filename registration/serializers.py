@@ -5,7 +5,7 @@ from registration.models import *
 
 
 class UserGroupSerializer(serializers.Serializer):
-    name = serializers.CharField(max_length=100, blank=False, default='')
+    name = serializers.CharFieвld(max_length=100, blank=False, default='')
     users = User(many=True)
 
     def create(self, validated_data):

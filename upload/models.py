@@ -25,14 +25,14 @@ class Workload(models.Model):
     frontend_status = models.CharField(max_length=100, blank=False, default='')
     complete_work = models.BooleanField()
     status = models.CharField(max_length=100, blank=False, default='')
-    #art_permission
-    #sketches
+    art_permission = models.FileField()
+    sketches = []
 
 
 class ArtWork(models.Model):
     artist_user = []
     photo_after = models.URLField(max_length=500, blank=False, default='')
     requirements = models.TextField(max_length=500)
-    #sketch
+    sketch = Sketch()
     permision_letter_url =  models.URLField(max_length=500, blank=False, default='')
     legal_agreement_url = models.URLField(max_length=500, blank=False, default='')

@@ -11,7 +11,8 @@ class CustomLimitation(models.Model):
 
 
 class ApprovalGroup(models.Model):
-    hierarchy = models.ForeignKey(Hierarchy, limit_choices_to={'name': 'Government'}, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100, blank=False, default='')
+    hierarchy = []
 
 
 class Veto(models.Model):

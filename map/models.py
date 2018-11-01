@@ -10,9 +10,6 @@ class Limitation(models.Model):
 
 
 class Location(models.Model):
-    position = models.FloatField()
-    restrictions = models.ForeignKey(Limitation, on_delete=models.CASCADE)
-
-
-
-
+    position = models.FloatField(blank=False)
+    street_address = models.CharField(max_length=100, blank=False)
+    restrictions = []
