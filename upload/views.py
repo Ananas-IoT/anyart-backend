@@ -4,7 +4,6 @@ from django.contrib.auth import views
 from rest_framework import viewsets, filters, generics
 from  rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.models import Token
-from django.contrib.auth import get_user_model
 
 from authorization.serializers import UserSerializer
 from upload.models import Sketch
@@ -17,8 +16,5 @@ class SketchViewSet(viewsets.ModelViewSet):
 
 
 
-class CreateUserView(generics.CreateAPIView):
-    model = get_user_model()
-    permission_classes = (AllowAny, )
-    serializer_class = UserSerializer
+
 

@@ -1,12 +1,10 @@
 from django.urls import path
 from rest_framework.urlpatterns import format_suffix_patterns
 from django.conf.urls import include
-from . import views
+
+from authorization.views import UserViewSet
 
 urlpatterns = [
-    path('login/', views.SimpleUserLogin.as_view(template_name='rest_framework/login.html'), name='login'),
-    path('logout/', views.SimpleUserLogout.as_view(), name='logout'),
-    path('rest-auth/', include('rest_auth.urls')),
+    path('registration/', UserViewSet.as_view({'post': 'create'})),
+    path('login', UserViewSet.as_view({'get': 'login'})),
 ]
-
-urlpatterns = format_suffix_patterns(urlpatterns)
