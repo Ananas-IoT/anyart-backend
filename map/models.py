@@ -5,7 +5,7 @@ class Limitation(models.Model):
     id = models.AutoField(blank=False, primary_key=True)
     authority = models.IntegerField(blank=False)
     reason = models.CharField(max_length=100, blank=False, default='')
-    restriction = models.CharField(max_length=100, blank=True, default='')
+    restriction = models.CharField(max_length=100, blank=True, editable=True)
 
 
 class Location(models.Model):

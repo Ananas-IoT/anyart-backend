@@ -14,7 +14,7 @@ class PhotoUpload(models.Model):
 
 class Sketch(models.Model):
     img_url = models.URLField(max_length=500, blank=False, default='')
-    restrictions = models.ForeignKey('upload.CustomLimitation', on_delete=models.CASCADE)
+    restrictions = models.ForeignKey('approval.CustomLimitation', on_delete=models.CASCADE)
     artist = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='sketches')
     sketchStatus = models.CharField(max_length=100, blank=True, default='')
 
@@ -35,3 +35,4 @@ class ArtWork(models.Model):
     sketch = models.OneToOneField('upload.Sketch', on_delete=models.CASCADE, related_name='art_work')
     permission_letter_url = models.FileField(blank=True)
     legal_agreement_url = models.FileField(blank=True)
+

@@ -19,7 +19,6 @@ class LocationViewSet(viewsets.ModelViewSet):
     queryset = Location.objects.all()
     serializer_class = LocationSerializer
 
-    @action(detail=True, permission_classes=[IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly])
     def list(self, request):
         queryset = Location.objects.all()
         serializer = LocationSerializer(queryset, many=True)

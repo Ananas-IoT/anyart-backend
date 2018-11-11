@@ -3,7 +3,6 @@ from rest_framework.urlpatterns import format_suffix_patterns
 
 
 from map.views import LocationViewSet
-from rest_framework import renderers
 
 map_list = LocationViewSet.as_view({
     'get': 'list',
@@ -28,5 +27,4 @@ urlpatterns = format_suffix_patterns([
 ])
 
 
-urlpatterns = []
 
