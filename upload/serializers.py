@@ -6,13 +6,16 @@ from upload.models import PhotoUpload, Sketch, Workload, ArtWork
 class PhotoUploadSerializer(serializers.ModelSerializer):
     class Meta:
         model = PhotoUpload
-        fields = ('photo_url', 'location', 'user')
+        fields = ('photo', )
 
 
 class SketchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sketch
         fields = ('img_url', 'restrictions', 'artists', 'sketchStatus')
+
+    def create(self, validated_data):
+        lng
 
 
 class WorkloadSerializer(serializers.ModelSerializer):

@@ -46,8 +46,6 @@ class UserViewSet(viewsets.ModelViewSet):
                             status=status.HTTP_400_BAD_REQUEST)
         user_serializer = self.get_serializer(data=request.data)
 
-
-
         user_serializer.is_valid(raise_exception=True)
         try:
             user_serializer.username_exists()
