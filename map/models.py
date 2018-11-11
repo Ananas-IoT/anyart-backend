@@ -1,8 +1,6 @@
 from django.db import models
 
 
-# Create your models here.
-
 class Limitation(models.Model):
     id = models.AutoField(blank=False, primary_key=True)
     authority = models.IntegerField(blank=False)

@@ -1,7 +1,5 @@
+from django.contrib.auth.models import User
 from django.db import models
-
-# Create your models here.
-# from authorization.models import Hierarchy
 
 
 class CustomLimitation(models.Model):
@@ -18,3 +16,15 @@ class ApprovalGroup(models.Model):
 class Veto(models.Model):
     name = models.CharField(max_length=100, blank=False, default='')
     veto_rank = models.IntegerField()
+
+
+class UserHierarchyWrapper(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, )
+    hierarchy_rank = models.IntegerField(default=1)
+    veto_list = []
+
+
+class Hierarchy(models.Model):
+    name = models.CharField(max_length=100, blank=False, default='')
+    users = []
+

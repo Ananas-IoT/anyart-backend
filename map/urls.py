@@ -26,3 +26,7 @@ urlpatterns = format_suffix_patterns([
     path('maps/<int:pk>/', map_detail, name='map-detail'),
     path('maps/limitations/<int:pk>/', map_limitations, name='map-limitations'),
 ])
+
+
+urlpatterns = []
+
