@@ -5,8 +5,8 @@ from django.contrib.auth.models import User
 
 
 class PhotoUpload(models.Model):
-    photo = models.ImageField(verbose_name='Uploaded image')
-    location = models.OneToOneField('map.Location', on_delete=models.CASCADE)
+    photo = models.TextField(verbose_name='Uploaded image')
+    location = models.ForeignKey('map.Location', on_delete=models.CASCADE)
     owner = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='photo_uploads')
     description = models.TextField(max_length=500, blank=False, default='')
 
@@ -31,7 +31,7 @@ class ArtWork(models.Model):
     artist_user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
     photo_after = models.ImageField(verbose_name='Completed work')
     requirements = models.TextField(max_length=500)
-    sketch = models.OneToOneField('upload.Sketch', on_delete=models.CASCADE, related_name='art_work', default=None)
+    sketch = models.ForeignKey('upload.Sketch', on_delete=models.CASCADE, related_name='art_work', null=True)
     permission_letter_url = models.FileField(blank=True)
     legal_agreement_url = models.FileField(blank=True)
 
