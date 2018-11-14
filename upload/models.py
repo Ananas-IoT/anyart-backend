@@ -12,11 +12,11 @@ class PhotoUpload(models.Model):
 
 
 class Sketch(models.Model):
-    workload = models.ForeignKey('upload.Workload', on_delete=models.CASCADE)
-    img = models.ImageField('Uploaded sketch')
+    workload = models.ForeignKey('upload.Workload', on_delete=models.CASCADE, default=None)
+    img = models.ImageField('Uploaded sketch', default=None)
     restrictions = models.ForeignKey('approval.CustomLimitation', on_delete=models.CASCADE)
-    artist = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='sketches')
-    sketchStatus = models.CharField(max_length=100, blank=True, default='')
+    artist = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='sketches', default=None)
+    sketch_status = models.CharField(max_length=100, blank=True, default='')
 
 
 class Workload(models.Model):
@@ -31,7 +31,7 @@ class ArtWork(models.Model):
     artist_user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
     photo_after = models.ImageField(verbose_name='Completed work')
     requirements = models.TextField(max_length=500)
-    sketch = models.OneToOneField('upload.Sketch', on_delete=models.CASCADE, related_name='art_work')
+    sketch = models.OneToOneField('upload.Sketch', on_delete=models.CASCADE, related_name='art_work', default=None)
     permission_letter_url = models.FileField(blank=True)
     legal_agreement_url = models.FileField(blank=True)
 
