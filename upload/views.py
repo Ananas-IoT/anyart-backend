@@ -2,12 +2,13 @@ from django.shortcuts import render
 from django.contrib.auth import views
 # Create your views here.
 from rest_framework import viewsets, filters, generics, status
+from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
-from authorization.permissions import IsTokenAuthenticated
+from authorization.permissions import IsTokenAuthenticated, IsAdmin
 from upload.models import Sketch, PhotoUpload
-from upload.serializers import SketchSerializer, PhotoUploadSerializer, DefaultPhotoUploadSerializer
+from upload.serializers import SketchSerializer, PhotoUploadSerializer, ReadOnlySerializer
 
 
 class SketchViewSet(viewsets.ModelViewSet):
@@ -25,7 +26,6 @@ class SketchViewSet(viewsets.ModelViewSet):
 
 
 class PhotoUploadViewSet(viewsets.ModelViewSet):
-    lookup_field = 'id'
     serializer_class = PhotoUploadSerializer
     queryset = PhotoUpload.objects.all()
     permission_classes = (IsTokenAuthenticated, )
@@ -42,8 +42,12 @@ class PhotoUploadViewSet(viewsets.ModelViewSet):
 
         return Response({'image': 'created'}, status=status.HTTP_201_CREATED)
 
+    @action(detail=False, methods=['GET'], permission_classes=[IsAdmin])
+    def get_all(self, request):
+        serializer = ReadOnlySerializer(self.queryset, many=True)
 
-class PhotoUploadListView(generics.ListAPIView):
-    queryset = PhotoUpload.objects.all()
-    serializer_class = DefaultPhotoUploadSerializer
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @action(detail=True, methods=['GET'])
+    def get_by_id(self, request, pk=None):
+        queryset = self.filter_queryset()

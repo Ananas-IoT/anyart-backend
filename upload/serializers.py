@@ -2,7 +2,6 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from upload.models import PhotoUpload, Sketch, Workload, ArtWork
-from django.core.files import File
 import base64
 
 
@@ -15,13 +14,6 @@ class PhotoUploadSerializer(serializers.HyperlinkedModelSerializer):
 
     def encode(self, photo):
         data = base64.b64encode(photo.read())
-        return data
-
-    def get_photo(self, obj):
-        f = open(obj.photo.path, 'rb')
-        image = File(f)
-        data = base64.b64encode(image.read())
-        f.close()
         return data
 
     def create(self, validated_data):
@@ -38,11 +30,12 @@ class PhotoUploadSerializer(serializers.HyperlinkedModelSerializer):
         return photo_upload
 
 
-class DefaultPhotoUploadSerializer(serializers.ModelSerializer):
+class ReadOnlySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PhotoUpload
         fields = ('photo', 'owner', 'description', 'location', 'id')
+        read_only_fields = ('photo', 'owner', 'description', 'location', 'id')
 
 
 class SketchSerializer(serializers.ModelSerializer):

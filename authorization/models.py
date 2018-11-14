@@ -5,6 +5,7 @@ USER_RIGHTS = (
     'gov',
     'artist',
     'basic',
+    'admin'
 )
 
 

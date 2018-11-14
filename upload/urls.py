@@ -1,16 +1,20 @@
 from django.urls import path
 
-from upload.views import PhotoUploadViewSet, PhotoUploadListView
+from upload.views import PhotoUploadViewSet
 
-detail_map = PhotoUploadViewSet.as_view({
+detail_dict = PhotoUploadViewSet.as_view({
     'get': 'retrieve',
     'put': 'update',
     'patch': 'partial_update',
     'delete': 'destroy'
 })
 
+raw_dict = PhotoUploadViewSet.as_view({
+    'post': 'create',
+    'get': 'get_all'
+})
+
 urlpatterns = [
-    path('photo_upload/', PhotoUploadViewSet.as_view({'post': 'create'})),
-    path('photo_upload/all/', PhotoUploadListView.as_view()),
-    path('photo_upload/<int:id>', detail_map)
+    path('photo_upload/', raw_dict),
+    path('photo_upload/<int:id>', detail_dict)
 ]

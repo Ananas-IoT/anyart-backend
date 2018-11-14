@@ -58,3 +58,13 @@ class IsBasicUserOrArtist(permissions.BasePermission):
             return True
         else:
             return False
+
+
+class IsAdmin(permissions.BasePermission):
+
+    def has_permission(self, request, view):
+        user_profile = UserProfile.objects.filter(owner_id=request.auth.user_id).get()
+        if user_profile.rights == 'admin':
+            return True
+        else:
+            return False

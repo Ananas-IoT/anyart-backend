@@ -18,7 +18,6 @@ map_limitations = LocationViewSet.as_view({
     'get': 'get_limitations',
     'put': 'add_limitations',
 })
-#urlpatterns = []
 
 urlpatterns = format_suffix_patterns([
     path('maps/', map_list, name='map-list'),
