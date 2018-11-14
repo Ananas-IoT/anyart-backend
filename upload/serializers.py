@@ -14,9 +14,6 @@ class SketchSerializer(serializers.ModelSerializer):
         model = Sketch
         fields = ('img_url', 'restrictions', 'artists', 'sketchStatus')
 
-    def create(self, validated_data):
-        lng
-
 
 class WorkloadSerializer(serializers.ModelSerializer):
     class Meta:

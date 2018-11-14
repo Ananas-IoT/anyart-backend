@@ -1,11 +1,12 @@
 
 from django.http import JsonResponse, Http404
 from rest_framework import viewsets, status
-from rest_framework.decorators import action
+from rest_framework.decorators import action, permission_classes
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED
 
+from authorization.permissions import IsBasicUserOrArtist, IsTokenAuthenticated
 from map.serializers import LocationSerializer, LimitationSerializer
 from map.models import Location
 from geopy.geocoders import Nominatim
@@ -19,7 +20,9 @@ class LocationViewSet(viewsets.ModelViewSet):
     queryset = Location.objects.all()
     serializer_class = LocationSerializer
 
-    def list(self, request):
+    permission_classes = (IsTokenAuthenticated, IsBasicUserOrArtist, )
+
+    def list(self, request, *args, **kwargs):
         queryset = Location.objects.all()
         serializer = LocationSerializer(queryset, many=True)
         return Response(serializer.data)
@@ -35,7 +38,7 @@ class LocationViewSet(viewsets.ModelViewSet):
         serializer = LocationSerializer(location)
         return Response(serializer.data)
 
-    def create(self, request):
+    def create(self, request, *args, **kwargs):
 
         serializer = LocationSerializer(data=request.data)
         geolocator = Nominatim()
@@ -43,7 +46,7 @@ class LocationViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             try:
                 serializer.validated_data['lat']
-            except:
+            except KeyError:
                 serializer.validated_data['lat'] = 0
 
             if serializer.validated_data['lat'] > 0:

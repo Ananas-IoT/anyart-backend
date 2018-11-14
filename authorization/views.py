@@ -4,7 +4,7 @@ from django.contrib.auth import views, get_user_model, authenticate
 # Create your views here.
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import viewsets, generics, status, serializers
-from rest_framework.decorators import permission_classes, action
+from rest_framework.decorators import permission_classes, action, api_view
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
@@ -78,4 +78,6 @@ class UserViewSet(viewsets.ModelViewSet):
     def perform_profile_create(self, serializer, **kwargs):
         instance = serializer.save(**kwargs)
         instance.save()
+
+
 

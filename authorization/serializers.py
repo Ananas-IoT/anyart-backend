@@ -7,12 +7,6 @@ from authorization.models import UserProfile
 
 class UserProfileSerializer(serializers.HyperlinkedModelSerializer):
 
-    # def __init__(self, **kwargs):
-    #     self.first_name = kwargs.get('first_name')
-    #     self.last_name = kwargs.get('last_name')
-    #     self.rights = kwargs.get('rigths')
-    #     super(UserProfileSerializer, self).__init__(**kwargs)
-
     rights = serializers.CharField(required=True)
     owner = serializers.ReadOnlyField(source='owner.username', required=False)
     sketches = serializers.HyperlinkedRelatedField(

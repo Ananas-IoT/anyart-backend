@@ -4,7 +4,8 @@ from django.conf.urls import include
 
 from authorization.views import UserViewSet
 
+
 urlpatterns = [
     path('registration/', UserViewSet.as_view({'post': 'create'})),
-    path('login', UserViewSet.as_view({'get': 'login'})),
+    path('login/', UserViewSet.as_view({'get': 'login'})),
 ]
