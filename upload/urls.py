@@ -3,7 +3,7 @@ from django.urls import path
 from upload.views import PhotoUploadViewSet
 
 detail_dict = PhotoUploadViewSet.as_view({
-    'get': 'retrieve',
+    'get': 'get_by_id',
     'put': 'update',
     'patch': 'partial_update',
     'delete': 'destroy'

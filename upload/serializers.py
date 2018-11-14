@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from upload.models import PhotoUpload, Sketch, Workload, ArtWork
 import base64
@@ -30,7 +31,7 @@ class PhotoUploadSerializer(serializers.HyperlinkedModelSerializer):
         return photo_upload
 
 
-class ReadOnlySerializer(serializers.ModelSerializer):
+class ReadOnlyPhotoUploadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PhotoUpload
@@ -45,10 +46,50 @@ class SketchSerializer(serializers.ModelSerializer):
 
 
 class WorkloadSerializer(serializers.ModelSerializer):
+    art_permission = serializers.FileField(required=False)
+
     class Meta:
         model = Workload
-        fields = ('photo_upload', 'frontend_status', 'complete_work', 'status',
+        fields = ('photo_upload', 'work_status', 'complete_work', 'generic_status',
                   'art_permission', 'sketches')
+
+    def encode(self, file):
+        data = base64.b64encode(file.read())
+        return data
+
+    def create(self, validated_data):
+        art_permission_encoded = None
+
+        try:
+            photo_upload = validated_data['photo_upload']
+        except KeyError:
+            raise ValidationError
+
+        work_status = validated_data.get('work_status')
+        status = validated_data.get('status')
+
+        try:
+            art_permission_file = validated_data['art_permission']
+            art_permission_encoded = self.encode(art_permission_file)
+        except KeyError:
+            pass
+
+        workload = Workload.objects.create(photo_upload=photo_upload, work_status=work_status,
+                                           art_permission_file=art_permission_encoded, status=status)
+
+        workload.save()
+
+        return workload
+
+
+class ReadOnlyWorkloadSerializer(serializers.HyperlinkedModelSerializer):
+
+    class Meta:
+        model = Workload
+        fields = ('photo_upload', 'work_status', 'complete_work', 'generic_status',
+                  'art_permission', 'sketches')
+        read_only_fields = ('photo_upload', 'work_status', 'complete_work', 'generic_status',
+                            'art_permission', 'sketches')
 
 
 class ArtWorkSerializer(serializers.ModelSerializer):

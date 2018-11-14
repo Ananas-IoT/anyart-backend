@@ -21,9 +21,9 @@ class Sketch(models.Model):
 
 class Workload(models.Model):
     photo_upload = models.ForeignKey('upload.PhotoUpload', max_length=500, blank=False, on_delete=models.CASCADE)
-    work_status = models.CharField(max_length=100, blank=False, default='')
-    complete_work = models.BooleanField()
-    status = models.CharField(max_length=100, blank=False, default='')
+    work_status = models.CharField(max_length=50, blank=False, default='initialized')
+    complete_work = models.BooleanField(default=False, blank=True)
+    generic_status = models.CharField(max_length=100, blank=False, default='initialized')
     art_permission = models.FileField()
 
 

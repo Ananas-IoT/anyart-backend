@@ -8,7 +8,7 @@ from rest_framework.response import Response
 
 from authorization.permissions import IsTokenAuthenticated, IsAdmin
 from upload.models import Sketch, PhotoUpload
-from upload.serializers import SketchSerializer, PhotoUploadSerializer, ReadOnlySerializer
+from upload.serializers import SketchSerializer, PhotoUploadSerializer, ReadOnlyPhotoUploadSerializer
 
 
 class SketchViewSet(viewsets.ModelViewSet):
@@ -26,6 +26,7 @@ class SketchViewSet(viewsets.ModelViewSet):
 
 
 class PhotoUploadViewSet(viewsets.ModelViewSet):
+    lookup_field = 'id'
     serializer_class = PhotoUploadSerializer
     queryset = PhotoUpload.objects.all()
     permission_classes = (IsTokenAuthenticated, )
@@ -42,12 +43,14 @@ class PhotoUploadViewSet(viewsets.ModelViewSet):
 
         return Response({'image': 'created'}, status=status.HTTP_201_CREATED)
 
-    @action(detail=False, methods=['GET'], permission_classes=[IsAdmin])
+    @action(detail=False, methods=['GET'])
     def get_all(self, request):
-        serializer = ReadOnlySerializer(self.queryset, many=True)
+        serializer = ReadOnlyPhotoUploadSerializer(self.queryset, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['GET'])
-    def get_by_id(self, request, pk=None):
-        queryset = self.filter_queryset()
+    def get_by_id(self, request, id=None):
+        instance = self.get_object()
+        serializer = ReadOnlyPhotoUploadSerializer(instance)
+        return Response(serializer.data, status=status.HTTP_200_OK)
