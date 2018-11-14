@@ -6,12 +6,13 @@ from django.contrib.auth.models import User
 
 class PhotoUpload(models.Model):
     photo = models.ImageField(verbose_name='Uploaded image')
-    location = models.OneToOneField('map.Location', on_delete=models.CASCADE, primary_key=True)
+    location = models.OneToOneField('map.Location', on_delete=models.CASCADE)
     owner = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='photo_uploads')
     description = models.TextField(max_length=500, blank=False, default='')
 
 
 class Sketch(models.Model):
+    workload = models.ForeignKey('upload.Workload', on_delete=models.CASCADE)
     img = models.ImageField('Uploaded sketch')
     restrictions = models.ForeignKey('approval.CustomLimitation', on_delete=models.CASCADE)
     artist = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='sketches')
@@ -19,12 +20,11 @@ class Sketch(models.Model):
 
 
 class Workload(models.Model):
-    photo_upload = models.URLField(max_length=500, blank=False, default='')
-    frontend_status = models.CharField(max_length=100, blank=False, default='')
+    photo_upload = models.ForeignKey('upload.PhotoUpload', max_length=500, blank=False, on_delete=models.CASCADE)
+    work_status = models.CharField(max_length=100, blank=False, default='')
     complete_work = models.BooleanField()
     status = models.CharField(max_length=100, blank=False, default='')
     art_permission = models.FileField()
-    sketches = []
 
 
 class ArtWork(models.Model):
