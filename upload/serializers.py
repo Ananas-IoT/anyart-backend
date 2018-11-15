@@ -45,7 +45,7 @@ class SketchSerializer(serializers.ModelSerializer):
         fields = ('img_url', 'restrictions', 'artists', 'sketchStatus')
 
 
-class WorkloadSerializer(serializers.ModelSerializer):
+class WorkloadSerializer(serializers.HyperlinkedModelSerializer):
     art_permission = serializers.FileField(required=False)
 
     class Meta:
@@ -92,7 +92,7 @@ class ReadOnlyWorkloadSerializer(serializers.HyperlinkedModelSerializer):
                             'art_permission', 'sketches')
 
 
-class ArtWorkSerializer(serializers.ModelSerializer):
+class ArtWorkSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ArtWork
         fields = ('artist_user', 'photo_after', 'requirements', 'permision_letter_url',

@@ -1,6 +1,3 @@
-from django.shortcuts import render
-from django.contrib.auth import views
-# Create your views here.
 from rest_framework import viewsets, filters, generics, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
