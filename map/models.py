@@ -9,8 +9,7 @@ class Limitation(models.Model):
 
 
 class Location(models.Model):
-
     lat = models.FloatField(null=True, blank=True, editable=True)
     lng = models.FloatField(null=True, blank=True, editable=True)
     street_address = models.CharField(max_length=200, blank=True)
-    restrictions = []
+    restrictions = models.ListField(verbose_name='restriction_list', null=True)

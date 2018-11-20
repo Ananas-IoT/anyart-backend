@@ -1,9 +1,9 @@
-from rest_framework import viewsets, filters, generics, status
+from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
-from authorization.permissions import IsTokenAuthenticated, IsAdmin
+from anyart_backend.permissions import IsTokenAuthenticated
 from upload.models import Sketch, PhotoUpload
 from upload.serializers import SketchSerializer, PhotoUploadSerializer, ReadOnlyPhotoUploadSerializer
 
