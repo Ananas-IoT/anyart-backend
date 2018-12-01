@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.contrib.auth import views, get_user_model, authenticate
 # Create your views here.
 from django.views.decorators.csrf import csrf_exempt
+from requests import Request
 from rest_framework import viewsets, generics, status, serializers
 from rest_framework.decorators import permission_classes, action, api_view
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -16,6 +17,14 @@ from authorization.serializers import UserSerializer, UserProfileSerializer
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+    def list(self, request, *args, **kwargs):
+        serializer_context = {
+            'request': Request(request),
+        }
+        queryset = User.objects.all()
+        serializer = UserSerializer(queryset, context=serializer_context, many=True)
+        return Response(serializer.data)
 
     @action(detail=False, url_path='login', url_name='login', methods=['get'], permission_classes=[AllowAny])
     def login(self, request):
