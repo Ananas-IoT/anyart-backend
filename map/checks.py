@@ -44,10 +44,7 @@ def check(adress_building, adress_street):
         for i in range(0, len(monuments_list)):
             print(monuments_list[i])
 
-            error_list.append({'address_street':monuments_list[i][4],
-                               'address_building': monuments_list[i][2],
-                               'address_notes':monuments_list[i][1],
-                               'limitation': monuments_list[i][3]})
+            error_list.append({'error': monuments_list[i]})
 
         # print(json.dumps(result, indent=4))
         # print(json.dumps(data, indent=5))
