@@ -1,21 +1,14 @@
 from json import dumps, loads
 
-from django.http import JsonResponse, Http404
+from django.http import Http404
 from rest_framework import viewsets, status
-from rest_framework.decorators import action, permission_classes
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED
 
-from authorization.permissions import IsBasicUserOrArtist, IsTokenAuthenticated
+from anyart_backend.permissions import IsBasicUserOrArtist, IsTokenAuthenticated
 from map.serializers import LocationSerializer, LimitationSerializer
 from map.models import Location, Limitation
 from geopy.geocoders import Nominatim
-
-
-class IsOwnerOrReadOnly(object):
-    pass
-
 
 class LocationViewSet(viewsets.ModelViewSet):
     queryset = Location.objects.all()

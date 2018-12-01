@@ -1,15 +1,15 @@
 from rest_framework import serializers
 
-from voting.models import Vote, GovernmentVote
+from voting.models import UserVote, GovernmentVote
 
 
-class VoteSerializer(serializers.ModelSerializer):
+class VoteSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = Vote
-        fields = ('user', 'vote', 'timestamp')
+        model = UserVote
+        fields = ('vote', )
 
 
-class GovernmentVoteSerializer(serializers.ModelSerializer):
+class GovernmentVoteSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = GovernmentVote
         fields = ('vote', 'timestamp')

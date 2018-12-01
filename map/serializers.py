@@ -6,7 +6,7 @@ from map.checks import check
 from map.models import Limitation, Location
 
 
-class LimitationSerializer(serializers.ModelSerializer):
+class LimitationSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Limitation
         fields = ('id', 'authority', 'reason', 'restriction')
@@ -15,9 +15,11 @@ class LimitationSerializer(serializers.ModelSerializer):
         limitation = Limitation.objects.create(**validated_data)
         return limitation
 
-
 class LocationSerializer(serializers.ModelSerializer):
     restrictions = LimitationSerializer(many=True, )
+
+
+class LocationSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Location

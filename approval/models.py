@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from django.db import models
+from djongo import models
 
 
 class CustomLimitation(models.Model):
@@ -10,21 +10,21 @@ class CustomLimitation(models.Model):
 
 class ApprovalGroup(models.Model):
     name = models.CharField(max_length=100, blank=False, default='')
-    hierarchy = []
+    hierarchy = models.ForeignKey('approval.Hierarchy', on_delete=models.CASCADE, null=True)
 
 
 class Veto(models.Model):
     name = models.CharField(max_length=100, blank=False, default='')
-    veto_rank = models.IntegerField()
+    veto_rank = models.IntegerField(default=1)
 
 
 class UserHierarchyWrapper(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, )
     hierarchy_rank = models.IntegerField(default=1)
-    veto_list = []
+    veto_list = models.ListField(verbose_name='veto_list', null=True)
 
 
 class Hierarchy(models.Model):
     name = models.CharField(max_length=100, blank=False, default='')
-    users = []
+    users = models.ListField(verbose_name='hierarchy_users', null=True)
 

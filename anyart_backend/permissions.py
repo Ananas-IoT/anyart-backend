@@ -17,7 +17,7 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
 class IsTokenAuthenticated(permissions.BasePermission):
 
     def has_permission(self, request, view):
-        return request.auth.key is not None
+        return request.auth is not None and request.auth.key is not None
 
 
 class IsArtist(permissions.BasePermission):

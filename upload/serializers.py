@@ -42,10 +42,24 @@ class ReadOnlyPhotoUploadSerializer(serializers.ModelSerializer):
 class SketchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sketch
-        fields = ('img_url', 'restrictions', 'artists', 'sketchStatus')
+        fields = ('img', 'artist', 'sketch_status')
+
+    def encode(self, file):
+        data = base64.b64encode(file.read())
+        return data
+
+    def create(self, validated_data):
+        img_file = validated_data['img']
+        img_encoded = self.encode(img_file)
+        token = self.context['token']
+        owner = User.objects.filter(id=token).get()
+
+        sketch = Sketch.objects.create(img=img_encoded, owner=owner)
+
+        return sketch
 
 
-class WorkloadSerializer(serializers.ModelSerializer):
+class WorkloadSerializer(serializers.HyperlinkedModelSerializer):
     art_permission = serializers.FileField(required=False)
 
     class Meta:
@@ -92,7 +106,7 @@ class ReadOnlyWorkloadSerializer(serializers.HyperlinkedModelSerializer):
                             'art_permission', 'sketches')
 
 
-class ArtWorkSerializer(serializers.ModelSerializer):
+class ArtWorkSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ArtWork
         fields = ('artist_user', 'photo_after', 'requirements', 'permision_letter_url',
