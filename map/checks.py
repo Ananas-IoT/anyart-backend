@@ -15,10 +15,11 @@ class APIError(Exception):
         return "APIError: status={}".format(self.status)
 
 
-def getListRecords():
+def check(adress_building, adress_street):
     parameters = {"resource_id": "d8dfe789-167d-4074-be39-d661c666e08d",
-                  "fields": {'_id', 'adress_street', 'adress_building', 'adress_notes'}, \
-                  #"filters": '{"adress_building": "1.0"}',
+                  "fields": {'_id', 'adress_street', 'adress_building', 'adress_notes', 'architect_decision_doctype'}, \
+                  "filters": '{"adress_building": "' + str(adress_building) + '",'
+                            '"adress_street": "' + str(adress_street) + '" }',
                   "limit": 5,  # set amount of result records
                   'records_format': 'lists'  # can be objects, lists, csv and tsv
                   }
@@ -26,6 +27,7 @@ def getListRecords():
 
     response = requests.get(url, params=parameters, headers=headers)
     print(response.status_code)
+
     if response.status_code != 200:
 
         raise APIError(response.status_code)
@@ -35,18 +37,25 @@ def getListRecords():
         #                              separators=(',', ': ')).encode(data)
         # pprint(json_data)
         # print(type(data))
-        result = data['result']['records']
-        for i in range(0, len(data['result']['records'])):
-            print(data['result']['records'][i])
+        error_list =[]
+        monuments_list = data['result']['records']
+        architect_decision_doctype = 4
+
+        for i in range(0, len(monuments_list)):
+            print(monuments_list[i])
+
+            error_list.append({'address_street':monuments_list[i][4],
+                               'address_building': monuments_list[i][2],
+                               'address_notes':monuments_list[i][1],
+                               'limitation': monuments_list[i][3]})
 
         # print(json.dumps(result, indent=4))
         # print(json.dumps(data, indent=5))
 
-    # print(response.content)
+        # print(response.content)
 
-    return result
+    return error_list
 
-def check_in_API():
-    
+
 if __name__ == '__main__':
-    getListRecords()
+    check()

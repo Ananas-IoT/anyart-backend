@@ -2,6 +2,7 @@ from json import loads, dumps
 
 from rest_framework import serializers
 
+from map.checks import check
 from map.models import Limitation, Location
 
 
@@ -11,7 +12,7 @@ class LimitationSerializer(serializers.ModelSerializer):
         fields = ('id', 'authority', 'reason', 'restriction')
 
     def create(self, validated_data):
-        limitation=Limitation.objects.create(**validated_data)
+        limitation = Limitation.objects.create(**validated_data)
         return limitation
 
 
@@ -76,4 +77,17 @@ class LocationSerializer(serializers.ModelSerializer):
         serializer = LocationSerializer(data=self.initial_data)
         serializer.update(old, loads(dumps(s)))
         return serializer
+
+    def check_in_api(self):
+        print(self.data)
+        address_data = self.data['street_address'].split(', ')
+
+        print(address_data)
+        address_building = float(address_data[0])
+        address_street = address_data[1].split()[0]
+        print(address_building)
+        print(address_street)
+
+        error_list = check(address_building, address_street)
+        return error_list
 

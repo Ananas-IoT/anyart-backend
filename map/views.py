@@ -1,3 +1,5 @@
+from json import dumps, loads
+
 from django.http import JsonResponse, Http404
 from rest_framework import viewsets, status
 from rest_framework.decorators import action, permission_classes
@@ -35,7 +37,11 @@ class LocationViewSet(viewsets.ModelViewSet):
     def get(self, request, pk, format=None):
         location = self.get_object(pk)
         serializer = LocationSerializer(location)
-        return Response(serializer.data)
+        error_list = serializer.check_in_api()
+        if error_list.__sizeof__()>0:
+            return Response(error_list)
+        else:
+            return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
 
@@ -129,6 +135,7 @@ class LocationViewSet(viewsets.ModelViewSet):
 
         except Http404:
             return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 
 # location = geolocator.geocode("Лукаша 5 Львів, Львівська область, 79000")
