@@ -2,6 +2,7 @@ import base64
 from json import loads, dumps
 
 from django.contrib.auth.models import User
+from geopy import Nominatim
 from rest_framework import serializers
 
 from map.checks import check
@@ -25,10 +26,36 @@ class LocationSerializer(serializers.ModelSerializer):
         fields = ('id', 'lat', 'lng', 'street_address', 'restrictions')
 
     def create(self, validated_data):
-        restrictions = validated_data.pop('restrictions')
-        location = Location.objects.create(**validated_data)
+        print(validated_data)
+        geolocator=Nominatim()
+        try:
+            restrictions = validated_data.pop('restrictions')
+            validated_data.pop('company')
+        except KeyError:
+            pass
+
+        try:
+            validated_data['lat']
+        except KeyError:
+            validated_data['lat'] = 0
+
+        if validated_data['lat'] > 0:
+            print(validated_data)
+            location = geolocator.reverse([validated_data['lat'], validated_data['lng']])
+            print(location.address)
+            validated_data['street_address'] = location.address
+        else:
+            geolocator = Nominatim()
+            location = geolocator.geocode([validated_data['street_address']])
+            print(location.address)
+            print(location.latitude, location.longitude)
+            validated_data['lat'] = location.latitude
+            validated_data['lng'] = location.longitude
         for track_data in restrictions:
             Limitation.objects.create(location=location, **track_data)
+        print(validated_data)
+        location = Location.objects.create(**validated_data)
+
         return location
 
     def update(self, instance, validated_data):
@@ -95,6 +122,7 @@ class LocationSerializer(serializers.ModelSerializer):
 
 class PhotoUploadSerializer(serializers.HyperlinkedModelSerializer):
     photo = serializers.ImageField(required=True)
+    photo_upload_id = serializers.IntegerField(required=True)
 
     class Meta:
         model = PhotoUpload
@@ -128,7 +156,7 @@ class WorkloadSerializer(serializers.HyperlinkedModelSerializer):
     work_status = serializers.CharField(required=False)
     generic_status = serializers.CharField(required=False)
     art_permission = serializers.CharField(required=False)
-    photo_upload = PhotoUploadSerializer(required=False)
+    photo_upload = ReadOnlyPhotoUploadSerializer(required=False)
     location = LocationSerializer(required=True, many=False)
 
     class Meta:

@@ -43,32 +43,33 @@ class LocationViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
-
         serializer = LocationSerializer(data=request.data)
         geolocator = Nominatim()
 
         if serializer.is_valid():
-            try:
-                serializer.validated_data['lat']
-            except KeyError:
-                serializer.validated_data['lat'] = 0
 
-            if serializer.validated_data['lat'] > 0:
-                print(serializer.validated_data)
-                location = geolocator.reverse([serializer.validated_data['lat'], serializer.validated_data['lng']])
-                print(location.address)
-                serializer.validated_data['street_address'] = location.address
-                serializer.save()
-                return Response({'status': 'location added'})
-            else:
-                geolocator = Nominatim()
-                location = geolocator.geocode([serializer.validated_data['street_address']])
-                print(location.address)
-                print(location.latitude, location.longitude)
-                serializer.validated_data['lat'] = location.latitude
-                serializer.validated_data['lng'] = location.longitude
-                serializer.save()
-                return Response({'status': 'location added'})
+            self.perform_create(serializer)
+            # try:
+            #     serializer.validated_data['lat']
+            # except KeyError:
+            #     serializer.validated_data['lat'] = 0
+            #
+            # if serializer.validated_data['lat'] > 0:
+            #     print(serializer.validated_data)
+            #     location = geolocator.reverse([serializer.validated_data['lat'], serializer.validated_data['lng']])
+            #     print(location.address)
+            #     serializer.validated_data['street_address'] = location.address
+            #     serializer.save()
+            #     return Response({'status': 'location added'})
+            # else:
+            #     geolocator = Nominatim()
+            #     location = geolocator.geocode([serializer.validated_data['street_address']])
+            #     print(location.address)
+            #     print(location.latitude, location.longitude)
+            #     serializer.validated_data['lat'] = location.latitude
+            #     serializer.validated_data['lng'] = location.longitude
+            #     serializer.save()
+            return Response({'status': 'location added'})
 
         else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

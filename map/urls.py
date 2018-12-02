@@ -41,7 +41,7 @@ urlpatterns = format_suffix_patterns([
     })),
     path('photo_upload/', PhotoUploadViewSet.as_view({
         'post': 'create',
-        'get': 'list'
+        'get': 'get_all'
     })),
     path('photo_upload/<int:pk>/', PhotoUploadViewSet.as_view({
         'get': 'get_by_id',
