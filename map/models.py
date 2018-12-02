@@ -35,8 +35,8 @@ class Sketch(models.Model):
     workload = models.ForeignKey('map.Workload', on_delete=models.CASCADE, default=None, blank=True)
     owner = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='sketches', default=None)
     img = models.TextField('Uploaded sketch', default=None)
-    sketch_status = models.CharField(max_length=100, blank=True, default='')
-    restrictions = models.ListField(verbose_name='sketch_restrictions', null=True)
+    sketch_status = models.CharField(max_length=100, blank=True, default='uploaded')
+    # restrictions = models.ListField(verbose_name='sketch_restrictions', null=True)
     # votes = models.ListField(verbose_name='sketch_votes', null=True)
     created = models.DateTimeField(auto_now_add=True)
 

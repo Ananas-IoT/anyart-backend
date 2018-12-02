@@ -6,7 +6,7 @@ from geopy import Nominatim
 from rest_framework import serializers
 
 from map.checks import check
-from map.models import Limitation, Location, Workload, PhotoUpload
+from map.models import Limitation, Location, Workload, PhotoUpload, Sketch
 
 
 class LimitationSerializer(serializers.ModelSerializer):
@@ -192,3 +192,38 @@ class ReadOnlyWorkloadSerializer(serializers.ModelSerializer):
         model = Workload
         fields = ('id', 'work_status', 'generic_status', 'created')
         read_only_fields = ('id', 'work_status', 'generic_status', 'created')
+
+
+class SketchSerializer(serializers.HyperlinkedModelSerializer):
+    workload_id = serializers.IntegerField(required=True)
+    img = serializers.FileField()
+
+    class Meta:
+        model = Sketch
+        fields = ('workload_id', 'owner', 'img', 'sketch_status', 'created')
+        required_fields = ('workload_id', )
+
+    def encode(self, photo):
+        data = base64.b64encode(photo.read())
+        return data
+
+    def create(self, validated_data):
+        token = self.context.get('token')
+        owner = User.objects.filter(id=token).get()
+        validated_data['owner'] = owner
+
+        file = validated_data.pop('img')
+        file_string = self.encode(file)
+        validated_data['img'] = file_string
+
+        sketch = Sketch.objects.create(**validated_data)
+
+        return sketch
+
+
+class SketchReadOnlySerializer(serializers.ModelSerializer):
+    # ('workload', 'sketch_status', 'created', 'owner', 'img', 'id')
+    class Meta:
+        model = Sketch
+        fields = '__all__'
+        read_only_fields = ('workload', 'sketch_status', 'created', 'owner', 'img', 'id')

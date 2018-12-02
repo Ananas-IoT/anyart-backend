@@ -2,7 +2,7 @@ from django.urls import path
 from rest_framework.urlpatterns import format_suffix_patterns
 
 
-from map.views import LocationViewSet, LimitationViewSet, WorkloadViewSet, PhotoUploadViewSet
+from map.views import LocationViewSet, LimitationViewSet, WorkloadViewSet, PhotoUploadViewSet, SketchViewSet
 
 map_list = LocationViewSet.as_view({
     'get': 'list',
@@ -39,6 +39,11 @@ urlpatterns = format_suffix_patterns([
         'post': 'create',
         'get': 'list'
     })),
+    path('workload/<int:pk>/', WorkloadViewSet.as_view({
+        'delete': 'destroy',
+        'get': 'retrieve',
+        'put': 'update'
+    })),
     path('photo_upload/', PhotoUploadViewSet.as_view({
         'post': 'create',
         'get': 'get_all'
@@ -47,6 +52,10 @@ urlpatterns = format_suffix_patterns([
         'get': 'get_by_id',
         'delete': 'destroy',
         'put': 'update'
+    })),
+    path('sketch/', SketchViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
     }))
 ])
 
