@@ -1,9 +1,11 @@
+import base64
 from json import loads, dumps
 
+from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from map.checks import check
-from map.models import Limitation, Location
+from map.models import Limitation, Location, Workload, PhotoUpload
 
 
 class LimitationSerializer(serializers.ModelSerializer):
@@ -14,9 +16,6 @@ class LimitationSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         limitation = Limitation.objects.create(**validated_data)
         return limitation
-
-class LocationSerializer(serializers.ModelSerializer):
-    restrictions = LimitationSerializer(many=True, )
 
 
 class LocationSerializer(serializers.ModelSerializer):
@@ -93,3 +92,75 @@ class LocationSerializer(serializers.ModelSerializer):
         error_list = check(address_building, address_street)
         return error_list
 
+
+class PhotoUploadSerializer(serializers.HyperlinkedModelSerializer):
+    photo = serializers.ImageField(required=True)
+
+    class Meta:
+        model = PhotoUpload
+        fields = ('photo', 'photo_upload_id')
+
+    def encode(self, photo):
+        data = base64.b64encode(photo.read())
+        return data
+
+    def create(self, validated_data):
+        photo_file = validated_data.get('photo')
+        photo_string = self.encode(photo_file)
+        photo_id = validated_data.get('photo_upload_id')
+
+        photo_upload = PhotoUpload.objects.filter(id=photo_id, photo=photo_string)
+
+        photo_upload.save()
+
+        return photo_upload
+
+
+class ReadOnlyPhotoUploadSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PhotoUpload
+        fields = ('photo', 'owner', 'description', 'location', 'id')
+        read_only_fields = ('photo', 'owner', 'description', 'location', 'id')
+
+
+class WorkloadSerializer(serializers.HyperlinkedModelSerializer):
+    work_status = serializers.CharField(required=False)
+    generic_status = serializers.CharField(required=False)
+    art_permission = serializers.CharField(required=False)
+    photo_upload = PhotoUploadSerializer(required=False)
+    location = LocationSerializer(required=True, many=False)
+
+    class Meta:
+        model = Workload
+        fields = ('work_status', 'generic_status', 'art_permission', 'photo_upload', 'location')
+
+    # def validate_location(self, value):
+
+
+    def create(self, validated_data):
+        photo_upload_data = validated_data.pop('photo_upload')
+        location_data = validated_data.pop('location')
+
+        workload = Workload.objects.create(**validated_data)
+
+        photo_upload_data['workload'] = workload
+
+        location_serializer = LocationSerializer()
+        location = location_serializer.create(location_data)
+
+        photo_upload_data['location'] = location
+        token = self.context.get('token')
+        owner = User.objects.filter(id=token).get()
+        photo_upload_data['owner'] = owner
+
+        photo_upload = PhotoUpload.objects.create(**photo_upload_data)
+
+        return workload
+
+class ReadOnlyWorkloadSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Workload
+        fields = ('id', 'work_status', 'generic_status', 'created')
+        read_only_fields = ('id', 'work_status', 'generic_status', 'created')

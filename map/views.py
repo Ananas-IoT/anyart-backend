@@ -2,13 +2,19 @@ from json import dumps, loads
 
 from django.http import Http404
 from rest_framework import viewsets, status
+from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED
 
 from anyart_backend.permissions import IsBasicUserOrArtist, IsTokenAuthenticated
-from map.serializers import LocationSerializer, LimitationSerializer
-from map.models import Location, Limitation
+from map.serializers import LocationSerializer, LimitationSerializer, WorkloadSerializer, PhotoUploadSerializer, \
+    ReadOnlyPhotoUploadSerializer, ReadOnlyWorkloadSerializer
+from map.models import Location, Limitation, Workload, PhotoUpload
 from geopy.geocoders import Nominatim
+
+import json
+
 
 class LocationViewSet(viewsets.ModelViewSet):
     queryset = Location.objects.all()
@@ -133,8 +139,6 @@ class LocationViewSet(viewsets.ModelViewSet):
 
 # location = geolocator.geocode("Лукаша 5 Львів, Львівська область, 79000")
 # location = geolocator.reverse("49.821884, 23.987562")
-
-
 class LimitationViewSet(viewsets.ModelViewSet):
     queryset = Location.objects.all()
     serializer_class = LocationSerializer
@@ -163,3 +167,56 @@ class LimitationViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         return Response({'status': 'limitation deleted'})
+
+
+class WorkloadViewSet(viewsets.ModelViewSet):
+    queryset = Workload.objects.all()
+    serializer_class = WorkloadSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = WorkloadSerializer(data=request.data, context={'token': request.auth.user_id})
+        if serializer.is_valid():
+            workload = self.perform_create(serializer)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        photo_upload_id = PhotoUpload.objects.filter(workload=workload).get().id
+        return Response({'photo_upload_id': photo_upload_id}, status=status.HTTP_201_CREATED)
+
+    def perform_create(self, serializer):
+        return serializer.save()
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return ReadOnlyWorkloadSerializer
+        return WorkloadSerializer
+
+
+
+class PhotoUploadViewSet(viewsets.ModelViewSet):
+    serializer_class = PhotoUploadSerializer
+    queryset = PhotoUpload.objects.all()
+    permission_classes = (IsTokenAuthenticated, )
+
+    def create(self, request, *args, **kwargs):
+        serializer = PhotoUploadSerializer(data=request.data, context={'token': request.auth.user_id})
+
+        try:
+            serializer.is_valid(raise_exception=True)
+        except ValidationError:
+            return Response("Invalid data in serializer")
+
+        self.perform_create(serializer)
+
+        return Response({'image': 'created'}, status=status.HTTP_201_CREATED)
+
+    @action(detail=False, methods=['GET'])
+    def get_all(self, request):
+        serializer = ReadOnlyPhotoUploadSerializer(self.queryset, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['GET'])
+    def get_by_id(self, request, pk=None):
+        instance = self.get_object()
+        serializer = ReadOnlyPhotoUploadSerializer(instance)
+        return Response(serializer.data, status=status.HTTP_200_OK)

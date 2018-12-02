@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'authorization.apps.AuthorizationConfig',
     'approval.apps.ApprovalConfig',
     'map.apps.MapConfig',
-    'upload.apps.UploadConfig',
     'voting.apps.VotingConfig'
 ]
 

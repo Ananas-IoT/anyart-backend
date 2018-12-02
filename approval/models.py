@@ -21,10 +21,10 @@ class Veto(models.Model):
 class UserHierarchyWrapper(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, )
     hierarchy_rank = models.IntegerField(default=1)
-    veto_list = models.ListField(verbose_name='veto_list', null=True)
+    # veto_list = models.ListField(verbose_name='veto_list', null=True)
 
 
 class Hierarchy(models.Model):
     name = models.CharField(max_length=100, blank=False, default='')
-    users = models.ListField(verbose_name='hierarchy_users', null=True)
+    # users = models.ListField(verbose_name='hierarchy_users', null=True)
 
