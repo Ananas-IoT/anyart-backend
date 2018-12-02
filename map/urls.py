@@ -38,25 +38,30 @@ urlpatterns = format_suffix_patterns([
     path('workload/', WorkloadViewSet.as_view({
         'post': 'create',
         'get': 'list'
-    })),
+    }), name='workload-list'),
     path('workload/<int:pk>/', WorkloadViewSet.as_view({
         'delete': 'destroy',
         'get': 'retrieve',
         'put': 'update'
-    })),
+    }), name='workload-detail'),
     path('photo_upload/', PhotoUploadViewSet.as_view({
         'post': 'create',
         'get': 'get_all'
-    })),
+    }), name='photo_upload-list'),
     path('photo_upload/<int:pk>/', PhotoUploadViewSet.as_view({
         'get': 'get_by_id',
         'delete': 'destroy',
         'put': 'update'
-    })),
+    }), name='photo_upload-detail'),
     path('sketch/', SketchViewSet.as_view({
         'get': 'list',
         'post': 'create'
-    }))
+    }), name='sketch-list'),
+    path('sketch/<int:pk>/', SketchViewSet.as_view({
+        'get': 'retrieve',
+        'delete': 'destroy',
+        'put': 'update'
+    }), name='sketch-detail')
 ])
 
 

@@ -192,7 +192,6 @@ class WorkloadViewSet(viewsets.ModelViewSet):
         return WorkloadSerializer
 
 
-
 class PhotoUploadViewSet(viewsets.ModelViewSet):
     serializer_class = PhotoUploadSerializer
     queryset = PhotoUpload.objects.all()
@@ -237,6 +236,17 @@ class SketchViewSet(viewsets.ModelViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response('sketch added', status=status.HTTP_201_CREATED)
+
+    def update(self, request, *args, **kwargs):
+        serializer = self.get_serializer_class()
+        serializer = serializer(data=request.data, context={'token': request.auth.user_id})
+
+        if serializer.is_valid():
+            self.perform_update(serializer)
+
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response('sketch updated', status=status.HTTP_201_CREATED)
 
     def get_serializer_class(self):
         if self.request.method == 'GET':

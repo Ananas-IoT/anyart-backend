@@ -121,8 +121,8 @@ class LocationSerializer(serializers.ModelSerializer):
 
 
 class PhotoUploadSerializer(serializers.HyperlinkedModelSerializer):
-    photo = serializers.ImageField(required=True)
-    photo_upload_id = serializers.IntegerField(required=True)
+    photo = serializers.ImageField(required=False)
+    photo_upload_id = serializers.IntegerField(required=False)
 
     class Meta:
         model = PhotoUpload
@@ -157,14 +157,11 @@ class WorkloadSerializer(serializers.HyperlinkedModelSerializer):
     generic_status = serializers.CharField(required=False)
     art_permission = serializers.CharField(required=False)
     photo_upload = ReadOnlyPhotoUploadSerializer(required=False)
-    location = LocationSerializer(required=True, many=False)
+    location = LocationSerializer(required=False, many=False)
 
     class Meta:
         model = Workload
         fields = ('work_status', 'generic_status', 'art_permission', 'photo_upload', 'location')
-
-    # def validate_location(self, value):
-
 
     def create(self, validated_data):
         photo_upload_data = validated_data.pop('photo_upload')
@@ -185,6 +182,7 @@ class WorkloadSerializer(serializers.HyperlinkedModelSerializer):
         photo_upload = PhotoUpload.objects.create(**photo_upload_data)
 
         return workload
+
 
 class ReadOnlyWorkloadSerializer(serializers.ModelSerializer):
 
