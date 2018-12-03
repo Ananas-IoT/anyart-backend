@@ -17,7 +17,9 @@ class APIError(Exception):
 
 def check(adress_building, adress_street):
     parameters = {"resource_id": "d8dfe789-167d-4074-be39-d661c666e08d",
-                  "fields": {'_id', 'adress_street', 'adress_building', 'adress_notes', 'architect_decision_doctype'}, \
+                  "fields": {
+                             #'_id','adress_street', 'adress_building', 'adress_notes',
+                             'architect_decision_doctype'}, \
                   "filters": '{"adress_building": "' + str(adress_building) + '",'
                             '"adress_street": "' + str(adress_street) + '" }',
                   "limit": 5,  # set amount of result records
@@ -37,21 +39,26 @@ def check(adress_building, adress_street):
         #                              separators=(',', ': ')).encode(data)
         # pprint(json_data)
         # print(type(data))
-        error_list =[]
+        restriction_list =[]
         monuments_list = data['result']['records']
         architect_decision_doctype = 4
 
         for i in range(0, len(monuments_list)):
             print(monuments_list[i])
-
-            error_list.append({'error': monuments_list[i]})
+            monuments_list[i][0] = monuments_list[i][0].replace('"', " ")
+            print(monuments_list[i][0])
+            restriction_list.append({"authority": 0,
+                                     #"reason": json.loads(json.dumps(monuments_list[i][0])),
+                                     "reason": monuments_list[i][0],
+                                     #"reason":"Ann",
+                                     "restriction":""})
 
         # print(json.dumps(result, indent=4))
         # print(json.dumps(data, indent=5))
 
         # print(response.content)
 
-    return error_list
+    return restriction_list
 
 
 if __name__ == '__main__':

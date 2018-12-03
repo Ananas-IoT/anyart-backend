@@ -16,7 +16,7 @@ map_detail = LocationViewSet.as_view({
 })
 map_location_restrictions = LocationViewSet.as_view({
     'get': 'get_limitations',
-    'post': 'add_limitations',
+    'post': 'add_limitation',
 })
 limitation_list = LimitationViewSet.as_view({
     'get': 'list',

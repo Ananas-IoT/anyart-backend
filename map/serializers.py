@@ -15,19 +15,17 @@ class LimitationSerializer(serializers.ModelSerializer):
         fields = ('id', 'authority', 'reason', 'restriction')
 
     def create(self, validated_data):
-        limitation = Limitation.objects.create(**validated_data)
-        return limitation
+        return Limitation.objects.create(**validated_data)
 
 
 class LocationSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Location
         fields = ('id', 'lat', 'lng', 'street_address', 'restrictions')
 
     def create(self, validated_data):
         print(validated_data)
-        geolocator=Nominatim()
+        geolocator = Nominatim()
         try:
             restrictions = validated_data.pop('restrictions')
             validated_data.pop('company')
@@ -73,51 +71,79 @@ class LocationSerializer(serializers.ModelSerializer):
 
         for restriction in restrictions_data:
             print(restriction)
-            # try:
-            restriction_qs = Limitation.objects.filter(id=restriction['id'])
-            print(restriction['id'])
-            # except:
-            #     restriction_qs = Limitation.objects.filter(id=restriction.id)
-            #     print(restriction.id)
-            # print(restriction_qs)
+            try:
+                restriction_qs = Limitation.objects.filter(id=restriction['id'])
+                # print(restriction['id'])
+            except:
+                restriction_qs = Limitation.objects.filter(id=restriction)
+                # print(restriction)
+
+            print(restriction_qs)
 
             if restriction_qs.exists():
                 restriction = restriction_qs.first()
-                print("re")
-                print(restriction)
+                # print("re")
+                # print(restriction)
             else:
-                print('yes')
+                # print('yes')
                 restriction = LimitationSerializer.create(**restriction)
-                print("re")
-                print(restriction)
+                # print("rek")
+                # print(restriction)
             instance.restrictions.add(restriction)
+        print("is")
         print(instance)
+        return instance
 
     def create_limitations(self, validated_data):
-        print(validated_data.data)
-        limitations = validated_data.data
-        old = Location.objects.get(pk=self.initial_data['id'])
-        print(old)
 
-        self.initial_data['restrictions'].append(limitations)
-        s = self.initial_data
-        print(s)
-        serializer = LocationSerializer(data=self.initial_data)
-        serializer.update(old, loads(dumps(s)))
+        serializer = LocationSerializer(self)
+        # print(serializer.data)
+        print(validated_data)
+
+        serializer.data['restrictions'].append(validated_data)
+        s = serializer.data
+        # print(s)
+        return serializer.data
+
+    def add_limitation(serializer, location, restriction):
+        try:
+            id = int(restriction['id'])
+        except KeyError:
+            id = 0
+
+        if id > 0:
+            # print(restriction['id'])
+            # restrictions = LimitationSerializer(Limitation.objects.filter(id=restriction['id']).first()).data
+            restrictions = restriction['id']
+        else:
+            print(restriction)
+            restrictions = LimitationSerializer(data=restriction)
+            print(restrictions.is_valid())
+            if restrictions.is_valid():
+                restrictions.save()
+                restrictions = restrictions.data
+
+        # print(restrictions.data)
+
+        location_new = LocationSerializer.create_limitations(location, restrictions)
+
+        serializer = LocationSerializer(serializer.update(location, location_new))
+
         return serializer
 
     def check_in_api(self):
-        print(self.data)
+        # print(self.data)
         address_data = self.data['street_address'].split(', ')
 
-        print(address_data)
+        # print(address_data)
         address_building = float(address_data[0])
         address_street = address_data[1].split()[0]
         print(address_building)
         print(address_street)
 
-        error_list = check(address_building, address_street)
-        return error_list
+        restriction_list = check(address_building, address_street)
+
+        return restriction_list
 
 
 class PhotoUploadSerializer(serializers.HyperlinkedModelSerializer):
@@ -145,7 +171,6 @@ class PhotoUploadSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ReadOnlyPhotoUploadSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = PhotoUpload
         fields = ('photo', 'owner', 'description', 'location', 'id')
@@ -185,7 +210,6 @@ class WorkloadSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ReadOnlyWorkloadSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Workload
         fields = ('id', 'work_status', 'generic_status', 'created')
@@ -199,7 +223,7 @@ class SketchSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Sketch
         fields = ('workload_id', 'owner', 'img', 'sketch_status', 'created')
-        required_fields = ('workload_id', )
+        required_fields = ('workload_id',)
 
     def encode(self, photo):
         data = base64.b64encode(photo.read())

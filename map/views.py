@@ -36,9 +36,12 @@ class LocationViewSet(viewsets.ModelViewSet):
     def get(self, request, pk, format=None):
         location = self.get_object(pk)
         serializer = LocationSerializer(location)
-        error_list = serializer.check_in_api()
-        if error_list.__sizeof__()>0:
-            return Response(error_list)
+        restriction_list = serializer.check_in_api()
+        print(restriction_list)
+        for restriction in restriction_list:
+            serializer = LocationSerializer.add_limitation(serializer, location, json.loads(json.dumps(restriction)))
+        if restriction_list.__sizeof__() > 0:
+            return Response(restriction_list)
         else:
             return Response(serializer.data)
 
@@ -49,30 +52,30 @@ class LocationViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
 
             self.perform_create(serializer)
-            # try:
-            #     serializer.validated_data['lat']
-            # except KeyError:
-            #     serializer.validated_data['lat'] = 0
-            #
-            # if serializer.validated_data['lat'] > 0:
-            #     print(serializer.validated_data)
-            #     location = geolocator.reverse([serializer.validated_data['lat'], serializer.validated_data['lng']])
-            #     print(location.address)
-            #     serializer.validated_data['street_address'] = location.address
-            #     serializer.save()
-            #     return Response({'status': 'location added'})
-            # else:
-            #     geolocator = Nominatim()
-            #     location = geolocator.geocode([serializer.validated_data['street_address']])
-            #     print(location.address)
-            #     print(location.latitude, location.longitude)
-            #     serializer.validated_data['lat'] = location.latitude
-            #     serializer.validated_data['lng'] = location.longitude
-            #     serializer.save()
+            try:
+                serializer.validated_data['lat']
+            except KeyError:
+                serializer.validated_data['lat'] = 0
+
+            if serializer.validated_data['lat'] > 0:
+                print(serializer.validated_data)
+                location = geolocator.reverse([serializer.validated_data['lat'], serializer.validated_data['lng']])
+                print(location.address)
+                serializer.validated_data['street_address'] = location.address
+                serializer.save()
+                return Response({'status': 'location added'})
+            else:
+                geolocator = Nominatim()
+                location = geolocator.geocode([serializer.validated_data['street_address']])
+                print(location.address)
+                print(location.latitude, location.longitude)
+                serializer.validated_data['lat'] = location.latitude
+                serializer.validated_data['lng'] = location.longitude
+                serializer.save()
             return Response({'status': 'location added'})
 
         else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def perform_create(self, serializer):
         serializer.save(company=self.request.data)
@@ -109,33 +112,18 @@ class LocationViewSet(viewsets.ModelViewSet):
         except Http404:
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-    def add_limitations(self, request, pk, format=None):
+    def add_limitation(self, request, pk, format=None):
 
         try:
             location = self.get_object(pk)
-            serializer1 = LocationSerializer(location)
-            # print(serializer1.data)
+            serializer = LocationSerializer(self)
+            restriction = request.data
 
-            serializer = LocationSerializer(data=serializer1.data)
-            limitations = LimitationSerializer(data=request.data)
-            # print(limitations.initial_data)
-            # print(repr(limitations))
-            if limitations.is_valid():
-                limitations.save()
-                # print("limitat", end=" ")
-                # print(limitations.data)
-                location = LocationSerializer.create_limitations(serializer, limitations)
-
-                # print("serializer" + str(serializer.is_valid()))
-                if location.is_valid():
-                    return Response(location.validated_data, status=HTTP_201_CREATED)
-            else:
-                return Response(serializer.errors,
-                                status=status.HTTP_400_BAD_REQUEST)
+            serializer = LocationSerializer.add_limitation(serializer,location,restriction)
+            return Response(serializer.data, status=HTTP_201_CREATED)
 
         except Http404:
             return Response(status=status.HTTP_204_NO_CONTENT)
-
 
 
 # location = geolocator.geocode("Лукаша 5 Львів, Львівська область, 79000")
@@ -169,6 +157,14 @@ class LimitationViewSet(viewsets.ModelViewSet):
 
         return Response({'status': 'limitation deleted'})
 
+    def create(self, request, *args, **kwargs):
+        serializer = LimitationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'status': 'limitation added'})
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class WorkloadViewSet(viewsets.ModelViewSet):
     queryset = Workload.objects.all()
@@ -195,7 +191,7 @@ class WorkloadViewSet(viewsets.ModelViewSet):
 class PhotoUploadViewSet(viewsets.ModelViewSet):
     serializer_class = PhotoUploadSerializer
     queryset = PhotoUpload.objects.all()
-    permission_classes = (IsTokenAuthenticated, )
+    permission_classes = (IsTokenAuthenticated,)
 
     def create(self, request, *args, **kwargs):
         serializer = PhotoUploadSerializer(data=request.data, context={'token': request.auth.user_id})
